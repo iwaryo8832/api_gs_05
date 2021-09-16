@@ -1,0 +1,41 @@
+#obj-image0{
+
+ width: 10%;
+ height: 10%;
+ vertical-align:middle;
+ display: none;
+
+}
+
+#obj-image1{
+
+    width: 10%;
+    height: 10%;
+    display: none;
+    
+   }
+
+   #obj-image2{
+
+    width: 10%;
+    height: 10%;
+    display: none;
+   
+   }
+
+   #obj-image3{
+
+    width: 10%;
+    height: 10%;
+    display: none;
+   
+   }
+
+
+
+#main{
+
+ display: flex;
+ align-items: center;
+
+}

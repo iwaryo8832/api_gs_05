@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>streetmuseum</title>
+    <script src="js/jquery-2.1.3.min.js"></script>
+    <link rel="stylesheet" href="css/sample.css">
+</head>
+
+
+
+<body>
+    
+
+
+
+
+    <header>
+
+  
+
+
+    </header>
+
+    <main>
+
+
+        <!-- MAP[START] -->
+    <h1>STREET MUSEUM</h1>
+    <h2>管理者画面</h2>
+
+    <div id="myMap" style='width:100%;height:450px;'></div>
+        <!-- MAP[END] -->
+   
+    <button id="button">作品検索</button>
+        
+
+   
+        <p >MET Fine arts club</p>
+
+    <div id="main">
+
+        <img id="obj-image0" src="" alt="">
+        <img id="obj-image1" src="" alt="">
+        <img id="obj-image2" src="" alt="">
+        <img id="obj-image3" src="" alt="">
+
+    </div>
+
+
+    <button id="button2">ユーザーに公開する</button>
+ 
+    </main>
+
+    <footer></footer>
+
+
+    <script>
+
+        // 以下で書いていく関数から共通で仕様するグローバル変数を設定
+
+        let title = []; 
+        let artist =[];
+        let work = [];
+        let lati =[];
+        let longi =[];
+
+
+
+        // ボタンを押したらAPIをたたいて、画像そのほか情報を持ってくる
+
+        $("#button").click( async function(){
+
+        const res = await fetch("https://collectionapi.metmuseum.org/public/collection/v1/search?q=sunflowers");
+        const data = await res.json();
+
+        const array = data.objectIDs;
+
+            for (let i = 0; i < 4; i++) {
+
+                
+                const res2 = await fetch('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+array[i])
+              
+                const data2 = await res2.json();
+                console.log(data2);
+
+                    let img =document.getElementById("obj-image"+[i])
+                    console.log(img);
+                    img.src = data2.primaryImage;
+                  
+                    title.push(data2.title);
+                    artist.push(data2.artistULAN_URL);
+                    work.push(data2.objectURL);
+
+                    $("#obj-image"+[i]).show();
+            }
+        })
+
+
+       
+
+    </script>
+
+
+
+
+    <!-- 以下マップ上の動きを設定--------------------------------------------------- -->
+
+    <!-- [ MapTypeId ] https://msdn.microsoft.com/en-us/library/mt712700.aspx -->
+    <script src='https://www.bing.com/api/maps/mapcontrol?callback=GetMap&key=' async defer></script>
+    <script>
+    //Initialization processing
+
+  
+
+    function GetMap() {
+
+        const map = new Microsoft.Maps.Map('#myMap', {
+            center: new Microsoft.Maps.Location(47.6149, -122.1941), //Location center position
+            mapTypeId: Microsoft.Maps.MapTypeId.aerial, //Type: [load, aerial,canvasDark,canvasLight,birdseye,grayscale,streetside]
+            zoom: 8  //Zoom:1=zoomOut, 20=zoomUp[ 1~20 ]    
+        });
+
+        let center = map.getCenter();
+
+
+
+
+        // 作品の画像を押すと、地図上にピンが立つ。
+
+         $("#obj-image0").click(function(){
+
+        let pin = new Microsoft.Maps.Pushpin(center,{
+
+        color:'red',
+        draggable:true,
+        enableHoverStyle:true,
+        enableClickedStyle:true,
+        visible:true,
+        title: title[0] 
+
+        })
+
+        map.entities.push(pin);
+        
+
+            // ピンをクリックすると、アーティスト、作品の詳細に飛べるURLがピンで出てくる
+
+            Microsoft.Maps.Events.addHandler(pin, 'dblclick', function (e) {  
+            
+            lati.push(e.location.latitude);
+            longi.push(e.location.longitude);
+            
+            let infobox = new Microsoft.Maps.Infobox(new Microsoft.Maps.Location(e.location.latitude, e.location.longitude), {
+
+            title: title[0],
+
+            actions: [{
+            label: 'artist',
+            eventHandler: function () { //function
+                window.open(artist[0]);
+            }
+            }, {
+            label: 'work',
+            eventHandler: function () { //function
+                window.open(work[0]);
+            }
+            }]
+
+            });
+
+            infobox.setMap(map); //Add infobox to Map
+
+
+            });
+
+
+        });
+
+
+
+
+
+        $("#obj-image1").click(function(){
+    
+            let pin1 = new Microsoft.Maps.Pushpin(center,{
+
+            color:'red',
+            draggable:true,
+            enableHoverStyle:true,
+            enableClickedStyle:true,
+            visible:true,
+            title: title[1] 
+
+            })
+
+            map.entities.push(pin1);
+
+
+            // ピンをクリックすると、アーティスト、作品の詳細に飛べるURLがピンで出てくる
+
+            Microsoft.Maps.Events.addHandler(pin1, 'dblclick', function (e) {  
+            
+            lati.push(e.location.latitude);
+            longi.push(e.location.longitude);
+
+            let infobox = new Microsoft.Maps.Infobox(new Microsoft.Maps.Location(e.location.latitude, e.location.longitude), {
+
+            title: title[1],
+
+            actions: [{
+            label: 'artist',
+            eventHandler: function () { //function
+                window.open(artist[1]);
+            }
+            }, {
+            label: 'work',
+            eventHandler: function () { //function
+                window.open(work[1]);
+            }
+            }]
+
+            });
+
+            infobox.setMap(map); //Add infobox to Map
+
+
+            });
+
+
+
+        });
+
+
+
+
+        $("#obj-image2").click(function(){
+
+
+        let pin2 = new Microsoft.Maps.Pushpin(center,{
+
+        color:'red',
+        draggable:true,
+        enableHoverStyle:true,
+        enableClickedStyle:true,
+        visible:true,
+        title: title[2] 
+
+        })
+
+        map.entities.push(pin2);
+
+
+
+        // ピンをクリックすると、アーティスト、作品の詳細に飛べるURLがピンで出てくる
+
+        Microsoft.Maps.Events.addHandler(pin2, 'dblclick', function (e) {  
+            
+        lati.push(e.location.latitude);
+        longi.push(e.location.longitude);
+
+            let infobox = new Microsoft.Maps.Infobox(new Microsoft.Maps.Location(e.location.latitude, e.location.longitude), {
+
+            title: title[2],
+
+            actions: [{
+            label: 'artist',
+            eventHandler: function () { //function
+                window.open(artist[2]);
+            }
+            }, {
+            label: 'work',
+            eventHandler: function () { //function
+                window.open(work[2]);
+            }
+            }]
+
+            });
+
+            infobox.setMap(map); //Add infobox to Map
+
+
+            });
+
+
+        });
+
+
+
+
+
+
+
+        $("#obj-image3").click(function(){
+
+            let pin3 = new Microsoft.Maps.Pushpin(center,{
+
+            color:'red',
+            draggable:true,
+            enableHoverStyle:true,
+            enableClickedStyle:true,
+            visible:true,
+            title: title[3] 
+
+            })
+
+            map.entities.push(pin3);
+
+
+
+
+
+
+            // ピンをクリックすると、アーティスト、作品の詳細に飛べるURLがピンで出てくる
+
+            Microsoft.Maps.Events.addHandler(pin3, 'dblclick', function (e) {  
+            
+                lati.push(e.location.latitude);
+                longi.push(e.location.longitude);
+
+            let infobox = new Microsoft.Maps.Infobox(new Microsoft.Maps.Location(e.location.latitude, e.location.longitude), {
+
+               
+            title: title[3],
+
+            actions: [{
+            label: 'artist',
+            eventHandler: function () { //function
+                window.open(artist[3]);
+            }
+            }, {
+            label: 'work',
+            eventHandler: function () { //function
+                window.open(work[3]);
+            }
+            }]
+
+            });
+
+            infobox.setMap(map); //Add infobox to Map
+
+
+            });
+
+
+
+
+        });
+
+
+    }
+
+
+    </script>
+
+
+
+
+
+
+
+    <!-- ここから先はFIREBASEの設定 ----------------------------------------------------->
+
+
+
+    <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase.js"></script>
+    <script>
+    // firebaseの設定-------------------------------------------
+    // Your web app's Firebase configuration
+    var firebaseConfig = {
+      apiKey: "",
+      authDomain: "street-museum-25905.firebaseapp.com",
+      databaseURL: "https://street-museum-25905-default-rtdb.firebaseio.com/",
+      projectId: "street-museum-25905",
+      storageBucket: "street-museum-25905.appspot.com",
+      messagingSenderId: "315133392979",
+      appId: "1:315133392979:web:878469ebb4474167a2aea6"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+
+
+    //firebaseのデーターベース（保存させる場所）を使いますよ
+
+    const newPostRef = firebase.database().ref();
+
+
+    // 「ユーザーに公開するボタン」を押すとfirebase上に必要な情報をアップロードする
+
+    $("#button2").click(function(){
+
+
+        newPostRef.push({
+     
+        foruser1 : title,
+        foruser2 : artist,
+        foruser3 : work,
+        foruser4 : lati,
+        foruser5 : longi
+
+
+        })
+
+
+    })
+
+  
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>
+
+
+
+
